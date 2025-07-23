@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deck Shuffling Visualization</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        label {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input, select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .step-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .step-info {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 20px;
+        }
+        
+        .chord-container {
+            position: relative;
+            height: 500px;
+            margin-top: 30px;
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+        }
+        
+        .chord-title {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        #chordDiagram {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .algorithm-info {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #495057;
+            display: none;
+        }
+        
+        .algorithm-info.show {
+            display: block;
+        }
+        
+        .algorithm-info h4 {
+            margin: 0 0 8px 0;
+            color: #343a40;
+            font-size: 16px;
+        }
+        
+        .algorithm-info p {
+            margin: 0 0 8px 0;
+            line-height: 1.4;
+        }
+        
+        .algorithm-info .example {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 8px;
+        }
+        
+        .param-description {
+            font-size: 12px;
+            color: #666;
+            margin-top: 3px;
+            font-style: italic;
+        }
+        
+        .playback-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .playback-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        
+        .play-button {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .play-button:hover {
+            background-color: #218838;
+        }
+        
+        .play-button.playing {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .play-button.playing:hover {
+            background-color: #e0a800;
+        }
+        
+        .restart-button {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .restart-button:hover {
+            background-color: #5a6268;
+        }
+        
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .speed-slider {
+            width: 120px;
+        }
+        
+        .speed-display {
+            font-weight: bold;
+            color: #495057;
+            min-width: 60px;
+        }
+        
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .status.complete {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.running {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Deck Shuffling Visualization</h1>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="cardsPerSuit">Cards per Suit:</label>
+                <input type="number" id="cardsPerSuit" value="13" min="1" max="52" step="1">
+            </div>
+            
+            <div class="control-group">
+                <label for="numSuits">Number of Suits:</label>
+                <input type="number" id="numSuits" value="4" min="1" max="8" step="1">
+            </div>
+            
+            <div class="control-group">
+                <label for="maxSteps">Maximum Steps:</label>
+                <input type="number" id="maxSteps" value="100" min="10" max="1000" step="1">
+                <div class="param-description">Stop simulation after this many steps if deck hasn't returned to original order</div>
+            </div>
+            
+            <div class="control-group">
+                <label for="shuffleAlgorithm">Shuffle Algorithm:</label>
+                <select id="shuffleAlgorithm">
+                    <option value="alternating">Alternating Top/Bottom</option>
+                    <option value="alternating-reverse">Alternating Bottom/Top</option>
+                    <option value="riffle">Riffle Shuffle</option>
+                    <option value="cut">Cut Shuffle</option>
+                    <option value="fisherman">Fisherman Shuffle</option>
+                    <option value="monkey">Monkey Shuffle</option>
+                    <option value="weave">Weave Shuffle</option>
+                    <option value="faro">Perfect Faro Shuffle</option>
+                    <option value="pile">Pile Shuffle</option>
+                    <option value="spiral">Spiral Shuffle</option>
+                    <option value="reverse-sections">Reverse Sections</option>
+                </select>
+            </div>
+            
+            <div class="control-group" id="alternatingParams" style="display: none;">
+                <label for="cardsPerMove">Cards per Move:</label>
+                <input type="number" id="cardsPerMove" value="1" min="1" max="10" step="1">
+                <div class="param-description">How many cards to take per alternation (1 = traditional card-by-card)</div>
+            </div>
+            
+            <div class="control-group" id="riffleParams" style="display: none;">
+                <label for="riffleInterleavePerfect">Perfect Interleave:</label>
+                <input type="checkbox" id="riffleInterleavePerfect" checked>
+                <div class="param-description">Perfect = strict alternation, Imperfect = realistic with clumping</div>
+            </div>
+            
+            <div class="control-group" id="weaveParams" style="display: none;">
+                <label for="weaveSkipDistance">Skip Distance:</label>
+                <input type="number" id="weaveSkipDistance" value="3" min="2" max="8" step="1">
+                <div class="param-description">Take every nth card (2 = every other, 3 = every third)</div>
+            </div>
+            
+            <div class="control-group" id="faroParams" style="display: none;">
+                <label for="faroType">Faro Type:</label>
+                <select id="faroType">
+                    <option value="out">Out-shuffle (top card stays on top)</option>
+                    <option value="in">In-shuffle (top card goes second)</option>
+                </select>
+                <div class="param-description">Mathematical faro shuffles with different properties</div>
+            </div>
+            
+            
+            <div class="control-group" id="pileParams" style="display: none;">
+                <label for="pileCount">Number of Piles:</label>
+                <input type="number" id="pileCount" value="3" min="2" max="7" step="1">
+                <div class="param-description">Deal into this many piles, then collect</div>
+            </div>
+            
+            <div class="control-group" id="spiralParams" style="display: none;">
+                <label for="spiralSequence">Sequence Type:</label>
+                <select id="spiralSequence">
+                    <option value="fibonacci">Fibonacci (1,1,2,3,5,8...)</option>
+                    <option value="powers2">Powers of 2 (1,2,4,8,16...)</option>
+                    <option value="primes">Prime Numbers (2,3,5,7,11...)</option>
+                </select>
+                <div class="param-description">Mathematical sequence for placement positions</div>
+            </div>
+            
+            <div class="control-group" id="reverseSectionsParams" style="display: none;">
+                <label for="sectionCount">Number of Sections:</label>
+                <input type="number" id="sectionCount" value="4" min="2" max="8" step="1">
+                <div class="param-description">Split deck into sections and reverse each</div>
+            </div>
+            
+            <div class="control-group" id="cutParams" style="display: none;">
+                <label for="cutPosition">Cut Position (%):</label>
+                <input type="number" id="cutPosition" value="50" min="10" max="90" step="1">
+                <div class="param-description">Where to cut the deck (50% = middle, 25% = quarter from top)</div>
+            </div>
+            
+            <button id="startShuffle">Start Shuffle Simulation</button>
+        </div>
+        
+        <!-- Algorithm Explanations -->
+        <div class="algorithm-info" id="alternatingInfo">
+            <h4>Alternating Top/Bottom Shuffle</h4>
+            <p>Take cards from the original deck one by one (or in groups) and alternately place them on the <strong>top</strong> and <strong>bottom</strong> of a new pile.</p>
+            <div class="example">Example: Cards 1,2,3,4 → 1,3 on top, 2,4 on bottom → Final order: 3,1,2,4</div>
+        </div>
+        
+        <div class="algorithm-info" id="alternating-reverseInfo">
+            <h4>Alternating Bottom/Top Shuffle</h4>
+            <p>Take cards from the original deck one by one (or in groups) and alternately place them on the <strong>bottom</strong> and <strong>top</strong> of a new pile.</p>
+            <div class="example">Example: Cards 1,2,3,4 → 1,3 on bottom, 2,4 on top → Final order: 4,2,1,3</div>
+        </div>
+        
+        <div class="algorithm-info" id="riffleInfo">
+            <h4>Riffle Shuffle</h4>
+            <p>Split the deck in half, then interleave cards from both halves. This mimics the common card shuffling technique where you riffle the two halves together.</p>
+            <div class="example">Example: Split [1,2,3,4,5,6] → [1,2,3] and [4,5,6] → Interleave → [4,1,5,2,6,3]</div>
+        </div>
+        
+        <div class="algorithm-info" id="monkeyInfo">
+            <h4>Monkey Shuffle</h4>
+            <p>Randomly pick a card from anywhere in the deck and move it to the top. Named for the chaotic, seemingly random nature of the shuffle.</p>
+            <div class="example">Example: [1,2,3,4,5,6] → randomly pick card 4 → [4,1,2,3,5,6]</div>
+        </div>
+        
+        <div class="algorithm-info" id="weaveInfo">
+            <h4>Weave Shuffle</h4>
+            <p>Take every nth card from the deck (based on skip distance) and move them to the end, preserving their relative order.</p>
+            <div class="example">Example: [1,2,3,4,5,6] with skip=3 → take every 3rd: [3,6] → result: [1,2,4,5,3,6]</div>
+        </div>
+        
+        <div class="algorithm-info" id="faroInfo">
+            <h4>Perfect Faro Shuffle</h4>
+            <p>Mathematically perfect riffle shuffle. Split exactly in half and interleave with perfect precision. Out-shuffle keeps top card on top, in-shuffle moves it to second position.</p>
+            <div class="example">Example: [1,2,3,4,5,6] → split [1,2,3][4,5,6] → out-shuffle: [1,4,2,5,3,6]</div>
+        </div>
+        
+        
+        <div class="algorithm-info" id="pileInfo">
+            <h4>Pile Shuffle</h4>
+            <p>Deal cards one by one into multiple piles, then collect the piles in order. Creates interesting periodic patterns based on pile count.</p>
+            <div class="example">Example: [1,2,3,4,5,6] into 3 piles → [1,4][2,5][3,6] → collect: [1,4,2,5,3,6]</div>
+        </div>
+        
+        <div class="algorithm-info" id="spiralInfo">
+            <h4>Spiral Shuffle</h4>
+            <p>Place cards at positions determined by mathematical sequences like Fibonacci or prime numbers. Creates complex, mathematically interesting patterns.</p>
+            <div class="example">Example: Using Fibonacci positions (1,1,2,3,5...) to determine where each card goes in the new arrangement.</div>
+        </div>
+        
+        <div class="algorithm-info" id="reverseSectionsInfo">
+            <h4>Reverse Sections</h4>
+            <p>Split the deck into equal sections and reverse the order of cards within each section, keeping sections in the same position.</p>
+            <div class="example">Example: [1,2,3,4,5,6] into 3 sections → [2,1][4,3][6,5] → result: [2,1,4,3,6,5]</div>
+        </div>
+        
+        <div class="algorithm-info" id="cutInfo">
+            <h4>Cut Shuffle</h4>
+            <p>Cut the deck at a specific position and put the bottom portion on top. This is the simplest shuffle - just moving one section above another.</p>
+            <div class="example">Example: [1,2,3,4,5,6] cut at 50% → [1,2,3] and [4,5,6] → Put bottom on top → [4,5,6,1,2,3]</div>
+        </div>
+        
+        <div class="algorithm-info" id="fishermanInfo">
+            <h4>Fisherman Shuffle</h4>
+            <p>Alternately take cards from the very top and very bottom of the deck, building a new pile. Named for resembling how a fisherman might sort through a catch.</p>
+            <div class="example">Example: [1,2,3,4,5,6] → Take top(1), bottom(6), top(2), bottom(5) → New order: [1,6,2,5,3,4]</div>
+        </div>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <div class="step-controls">
+            <button id="prevStep" disabled>Previous Step</button>
+            <button id="nextStep" disabled>Next Step</button>
+            <span class="step-info">Step: <span id="currentStep">0</span> / <span id="totalSteps">0</span></span>
+            
+            <div class="control-group">
+                <label for="visualizationType">Visualization Type:</label>
+                <select id="visualizationType">
+                    <option value="bar">Bar Chart (Default)</option>
+                    <option value="scatter">Card Scatter Plot</option>
+                    <option value="waveform">Waveform</option>
+                    <option value="mandala">Mandala</option>
+                    <option value="particles">Particle System</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="playback-controls" id="playbackControls" style="display: none;">
+            <button id="playPauseButton" class="playback-button play-button">▶ Play</button>
+            <button id="restartButton" class="playback-button restart-button">⏮ Restart</button>
+            
+            <div class="speed-control">
+                <label for="speedSlider">Speed:</label>
+                <input type="range" id="speedSlider" class="speed-slider" min="0.1" max="5" step="0.1" value="1">
+                <span id="speedDisplay" class="speed-display">1.0x</span>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="deckChart"></canvas>
+            <svg id="scatterChart" style="display: none; width: 100%; height: 100%;"></svg>
+            <svg id="waveformChart" style="display: none; width: 100%; height: 100%;"></svg>
+            <svg id="mandalaChart" style="display: none; width: 100%; height: 100%;"></svg>
+            <canvas id="particlesChart" style="display: none; width: 100%; height: 100%;"></canvas>
+        </div>
+        
+        <div class="chord-container">
+            <div class="chord-title">Position Movement Diagram</div>
+            <svg id="chordDiagram"></svg>
+        </div>
+    </div>
+
+    <script src="deck-shuffling.js"></script>
+</body>
+</html>
