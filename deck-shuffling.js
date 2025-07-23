@@ -27,7 +27,8 @@ class DeckShuffleVisualizer {
         // Playback controls
         document.getElementById('playPauseButton').addEventListener('click', () => this.togglePlayback());
         document.getElementById('restartButton').addEventListener('click', () => this.restartPlayback());
-        document.getElementById('speedSlider').addEventListener('input', (e) => this.updatePlaybackSpeed(e.target.value));
+        document.getElementById('speedInput').addEventListener('input', (e) => this.updatePlaybackSpeed(e.target.value));
+        document.getElementById('speedInput').addEventListener('change', (e) => this.updatePlaybackSpeed(e.target.value));
         
         // Initialize parameter visibility
         this.updateParameterVisibility();
@@ -487,7 +488,7 @@ class DeckShuffleVisualizer {
         this.updateChordDiagram();
         
         // Show playback controls
-        document.getElementById('playbackControls').style.display = 'flex';
+        document.getElementById('unifiedControls').style.display = 'flex';
     }
     
     previousStep() {
@@ -1219,11 +1220,14 @@ class DeckShuffleVisualizer {
     }
     
     updatePlaybackSpeed(speed) {
+        console.log('updatePlaybackSpeed called with:', speed);
         this.playbackSpeed = parseFloat(speed);
+        console.log('playbackSpeed set to:', this.playbackSpeed);
         document.getElementById('speedDisplay').textContent = `${speed}x`;
         
         // If currently playing, restart timer with new speed
         if (this.isPlaying) {
+            console.log('Restarting playback with new speed');
             this.stopPlayback();
             this.startPlayback();
         }
