@@ -1540,6 +1540,101 @@ class DeckShuffleVisualizer {
     }
 }
 
+// Algorithm descriptions data
+const algorithmDescriptions = {
+    'alternating': {
+        title: '🔄 Alternating Top/Bottom Shuffle',
+        description: 'Take cards from the original deck one by one (or in groups) and alternately place them on the <strong>top</strong> and <strong>bottom</strong> of a new pile. This creates an interesting pattern where cards from different parts of the original deck become neighbors.',
+        example: 'Example: Cards 1,2,3,4 → 1,3 go on top, 2,4 go on bottom → Final order: 3,1,2,4'
+    },
+    'alternating-reverse': {
+        title: '🔃 Alternating Bottom/Top Shuffle',
+        description: 'Take cards from the original deck one by one (or in groups) and alternately place them on the <strong>bottom</strong> and <strong>top</strong> of a new pile. This is the reverse of the standard alternating shuffle.',
+        example: 'Example: Cards 1,2,3,4 → 1,3 go on bottom, 2,4 go on top → Final order: 4,2,1,3'
+    },
+    'riffle': {
+        title: '🃏 Riffle Shuffle',
+        description: 'Split the deck in half, then interleave cards from both halves. This mimics the common card shuffling technique where you riffle the two halves together. Can be done perfectly (strict alternation) or imperfectly (with natural clumping).',
+        example: 'Example: Split [1,2,3,4,5,6] → [1,2,3] and [4,5,6] → Interleave → [4,1,5,2,6,3]'
+    },
+    'cut': {
+        title: '✂️ Cut Shuffle',
+        description: 'Cut the deck at a specific position and put the bottom portion on top. This is the simplest shuffle - just moving one section above another. The cut position determines where the split occurs.',
+        example: 'Example: [1,2,3,4,5,6] cut at 50% → [1,2,3] and [4,5,6] → Put bottom on top → [4,5,6,1,2,3]'
+    },
+    'fisherman': {
+        title: '🎣 Fisherman Shuffle',
+        description: 'Alternately take cards from the very top and very bottom of the deck, building a new pile. Named for resembling how a fisherman might sort through a catch, taking from both ends.',
+        example: 'Example: [1,2,3,4,5,6] → Take top(1), bottom(6), top(2), bottom(5) → New order: [1,6,2,5,3,4]'
+    },
+    'monkey': {
+        title: '🐵 Monkey Shuffle',
+        description: 'Randomly pick a card from anywhere in the deck and move it to the top. Named for the chaotic, seemingly random nature of the shuffle. This creates highly unpredictable patterns.',
+        example: 'Example: [1,2,3,4,5,6] → randomly pick card 4 → [4,1,2,3,5,6]'
+    },
+    'weave': {
+        title: '🧵 Weave Shuffle',
+        description: 'Take every nth card from the deck (based on skip distance) and move them to the end, preserving their relative order. This creates interesting periodic patterns based on the skip distance.',
+        example: 'Example: [1,2,3,4,5,6] with skip=3 → take every 3rd: [3,6] → result: [1,2,4,5,3,6]'
+    },
+    'faro': {
+        title: '✨ Perfect Faro Shuffle',
+        description: 'Mathematically perfect riffle shuffle. Split exactly in half and interleave with perfect precision. Out-shuffle keeps the top card on top, in-shuffle moves it to the second position. Known for creating predictable cycles.',
+        example: 'Example: [1,2,3,4,5,6] → split [1,2,3][4,5,6] → out-shuffle: [1,4,2,5,3,6]'
+    },
+    'pile': {
+        title: '🏰 Pile Shuffle',
+        description: 'Deal cards one by one into multiple piles, then collect the piles in order. Creates interesting periodic patterns based on pile count. Commonly used in card games for fair distribution.',
+        example: 'Example: [1,2,3,4,5,6] into 3 piles → [1,4][2,5][3,6] → collect: [1,4,2,5,3,6]'
+    },
+    'spiral': {
+        title: '🌀 Spiral Shuffle',
+        description: 'Place cards at positions determined by mathematical sequences like Fibonacci, prime numbers, or powers of 2. Creates complex, mathematically interesting patterns based on the chosen sequence.',
+        example: 'Example: Using Fibonacci positions (1,1,2,3,5...) to determine where each card goes in the new arrangement.'
+    },
+    'reverse-sections': {
+        title: '🔁 Reverse Sections',
+        description: 'Split the deck into equal sections and reverse the order of cards within each section, keeping sections in the same position. The number of sections determines the pattern complexity.',
+        example: 'Example: [1,2,3,4,5,6] into 3 sections → [2,1][4,3][6,5] → result: [2,1,4,3,6,5]'
+    }
+};
+
+// Lightbox functions
+function showAlgorithmHelp() {
+    const algorithmSelect = document.getElementById('shuffleAlgorithm');
+    const selectedAlgorithm = algorithmSelect.value;
+    const info = algorithmDescriptions[selectedAlgorithm];
+    
+    if (info) {
+        document.getElementById('lightboxTitle').innerHTML = info.title;
+        document.getElementById('lightboxDescription').innerHTML = info.description;
+        document.getElementById('lightboxExample').innerHTML = info.example;
+        document.getElementById('algorithmLightbox').classList.add('show');
+        
+        // Prevent body scrolling when lightbox is open
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function hideLightbox() {
+    document.getElementById('algorithmLightbox').classList.remove('show');
+    document.body.style.overflow = 'auto';
+}
+
+// Close lightbox when clicking outside content
+document.getElementById('algorithmLightbox').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideLightbox();
+    }
+});
+
+// Close lightbox with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        hideLightbox();
+    }
+});
+
 // Initialize the visualizer when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     new DeckShuffleVisualizer();

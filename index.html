@@ -39,52 +39,206 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
-        .main-content {
+        .main-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .controls-sidebar {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             border-radius: 24px;
-            padding: 30px;
+            padding: 25px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .visualization-area {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-height: 600px;
         }
         
         .control-section {
-            margin-bottom: 25px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(102, 126, 234, 0.15);
         }
         
         .section-title {
-            font-size: 1.25rem;
-            font-weight: 700;
+            font-size: 1rem;
+            font-weight: 600;
             color: #1f2937;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             letter-spacing: 0.025em;
         }
         
         .controls {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 15px;
-            background: rgba(102, 126, 234, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .sidebar-start-button {
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 15px;
+            margin: 15px 0 0 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
             border-radius: 12px;
-            border: 1px solid rgba(102, 126, 234, 0.1);
+            cursor: pointer;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
         
-        .start-button-container {
-            text-align: center;
-            margin: 30px 0;
+        .sidebar-start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
         }
         
-        .start-button-container #startShuffle {
-            padding: 16px 40px;
-            font-size: 16px;
-            margin: 0;
+        .help-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: bold;
+            color: #667eea;
+            cursor: help;
+            margin-left: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .help-icon:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .algorithm-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        /* Lightbox Overlay Styles */
+        .lightbox-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .lightbox-overlay.show {
+            display: flex;
+        }
+        
+        .lightbox-content {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            animation: slideIn 0.3s ease;
+            margin: 20px;
+        }
+        
+        .lightbox-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+        
+        .lightbox-close:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            transform: scale(1.1);
+        }
+        
+        .lightbox-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+            padding-right: 40px;
+            letter-spacing: 0.025em;
+        }
+        
+        .lightbox-description {
+            font-size: 1rem;
+            color: #374151;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .lightbox-example {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid #667eea;
+            font-style: italic;
+            color: #4b5563;
+            font-size: 0.95rem;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
         
         .control-group {
@@ -188,16 +342,17 @@
             position: relative;
         }
         
-        .charts-wrapper {
+        .viz-charts-container {
             display: flex;
             gap: 20px;
-            margin-top: 30px;
+            margin-top: 20px;
+            height: 500px;
         }
         
         .chart-container {
             position: relative;
-            height: 500px;
-            flex: 1;
+            height: 100%;
+            flex: 2;
             background: rgba(255, 255, 255, 0.5);
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(102, 126, 234, 0.1);
@@ -208,7 +363,7 @@
         
         .chord-container {
             position: relative;
-            height: 500px;
+            height: 100%;
             flex: 1;
             background: rgba(255, 255, 255, 0.5);
             border-radius: 16px;
@@ -235,16 +390,58 @@
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
             border: 1px solid rgba(102, 126, 234, 0.2);
             border-radius: 16px;
-            padding: 20px;
+            padding: 0;
             margin-top: 15px;
             font-size: 14px;
             color: #374151;
             display: none;
             backdrop-filter: blur(10px);
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
         
         .algorithm-info.show {
             display: block;
+        }
+        
+        .algorithm-toggle {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 15px 20px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s ease;
+        }
+        
+        .algorithm-toggle:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .algorithm-toggle::after {
+            content: "▼";
+            transition: transform 0.3s ease;
+            font-size: 12px;
+        }
+        
+        .algorithm-toggle.collapsed::after {
+            transform: rotate(-90deg);
+        }
+        
+        .algorithm-content {
+            padding: 0 20px 20px 20px;
+            display: block;
+            transition: all 0.3s ease;
+        }
+        
+        .algorithm-content.collapsed {
+            display: none;
         }
         
         .algorithm-info h4 {
@@ -534,13 +731,33 @@
             margin: 0;
         }
         
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 300px 1fr;
+            }
+            
+            .controls-sidebar {
+                padding: 20px;
+            }
+        }
+        
         @media (max-width: 768px) {
             .hero h1 {
                 font-size: 2.5rem;
             }
             
-            .controls {
+            .main-layout {
                 grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .controls-sidebar {
+                position: static;
+                order: 2;
+            }
+            
+            .visualization-area {
+                order: 1;
             }
             
             .control-buttons {
@@ -559,7 +776,7 @@
                 justify-content: center;
             }
             
-            .charts-wrapper {
+            .viz-charts-container {
                 flex-direction: column;
             }
         }
@@ -587,234 +804,171 @@
             </div>
         </div>
         
-        <div class="main-content">
-        
-        <!-- Deck Configuration -->
-        <div class="control-section">
-            <h3 class="section-title">🃏 Deck Configuration</h3>
-            <div class="controls">
-                <div class="control-group">
-                    <label for="cardsPerSuit">Cards per Suit:</label>
-                    <input type="number" id="cardsPerSuit" value="13" min="1" max="52" step="1">
-                </div>
-                
-                <div class="control-group">
-                    <label for="numSuits">Number of Suits:</label>
-                    <input type="number" id="numSuits" value="4" min="1" max="8" step="1">
-                </div>
-            </div>
-        </div>
-        
-        <!-- Shuffle Algorithm -->
-        <div class="control-section">
-            <h3 class="section-title">🔀 Shuffle Algorithm</h3>
-            <div class="controls">
-                <div class="control-group">
-                    <label for="shuffleAlgorithm">Algorithm:</label>
-                    <select id="shuffleAlgorithm">
-                        <option value="alternating">Alternating Top/Bottom</option>
-                        <option value="alternating-reverse">Alternating Bottom/Top</option>
-                        <option value="riffle">Riffle Shuffle</option>
-                        <option value="cut">Cut Shuffle</option>
-                        <option value="fisherman">Fisherman Shuffle</option>
-                        <option value="monkey">Monkey Shuffle</option>
-                        <option value="weave">Weave Shuffle</option>
-                        <option value="faro">Perfect Faro Shuffle</option>
-                        <option value="pile">Pile Shuffle</option>
-                        <option value="spiral">Spiral Shuffle</option>
-                        <option value="reverse-sections">Reverse Sections</option>
-                    </select>
-                </div>
-                
-                <div class="control-group" id="alternatingParams" style="display: none;">
-                    <label for="cardsPerMove">Cards per Move:</label>
-                    <input type="number" id="cardsPerMove" value="1" min="1" max="10" step="1">
-                    <div class="param-description">How many cards to take per alternation (1 = traditional card-by-card)</div>
-                </div>
-                
-                <div class="control-group" id="riffleParams" style="display: none;">
-                    <label for="riffleInterleavePerfect">Perfect Interleave:</label>
-                    <input type="checkbox" id="riffleInterleavePerfect" checked>
-                    <div class="param-description">Perfect = strict alternation, Imperfect = realistic with clumping</div>
-                </div>
-                
-                <div class="control-group" id="weaveParams" style="display: none;">
-                    <label for="weaveSkipDistance">Skip Distance:</label>
-                    <input type="number" id="weaveSkipDistance" value="3" min="2" max="8" step="1">
-                    <div class="param-description">Take every nth card (2 = every other, 3 = every third)</div>
-                </div>
-                
-                <div class="control-group" id="faroParams" style="display: none;">
-                    <label for="faroType">Faro Type:</label>
-                    <select id="faroType">
-                        <option value="out">Out-shuffle (top card stays on top)</option>
-                        <option value="in">In-shuffle (top card goes second)</option>
-                    </select>
-                    <div class="param-description">Mathematical faro shuffles with different properties</div>
-                </div>
-                
-                <div class="control-group" id="pileParams" style="display: none;">
-                    <label for="pileCount">Number of Piles:</label>
-                    <input type="number" id="pileCount" value="3" min="2" max="7" step="1">
-                    <div class="param-description">Deal into this many piles, then collect</div>
-                </div>
-                
-                <div class="control-group" id="spiralParams" style="display: none;">
-                    <label for="spiralSequence">Sequence Type:</label>
-                    <select id="spiralSequence">
-                        <option value="fibonacci">Fibonacci (1,1,2,3,5,8...)</option>
-                        <option value="powers2">Powers of 2 (1,2,4,8,16...)</option>
-                        <option value="primes">Prime Numbers (2,3,5,7,11...)</option>
-                    </select>
-                    <div class="param-description">Mathematical sequence for placement positions</div>
-                </div>
-                
-                <div class="control-group" id="reverseSectionsParams" style="display: none;">
-                    <label for="sectionCount">Number of Sections:</label>
-                    <input type="number" id="sectionCount" value="4" min="2" max="8" step="1">
-                    <div class="param-description">Split deck into sections and reverse each</div>
-                </div>
-                
-                <div class="control-group" id="cutParams" style="display: none;">
-                    <label for="cutPosition">Cut Position (%):</label>
-                    <input type="number" id="cutPosition" value="50" min="10" max="90" step="1">
-                    <div class="param-description">Where to cut the deck (50% = middle, 25% = quarter from top)</div>
-                </div>
-            </div>
-            
-            <!-- Algorithm Explanations -->
-            <div class="algorithm-info" id="alternatingInfo">
-                <h4>🔄 Alternating Top/Bottom Shuffle</h4>
-                <p>Take cards from the original deck one by one (or in groups) and alternately place them on the <strong>top</strong> and <strong>bottom</strong> of a new pile.</p>
-                <div class="example">Example: Cards 1,2,3,4 → 1,3 on top, 2,4 on bottom → Final order: 3,1,2,4</div>
-            </div>
-            
-            <div class="algorithm-info" id="alternating-reverseInfo">
-                <h4>🔃 Alternating Bottom/Top Shuffle</h4>
-                <p>Take cards from the original deck one by one (or in groups) and alternately place them on the <strong>bottom</strong> and <strong>top</strong> of a new pile.</p>
-                <div class="example">Example: Cards 1,2,3,4 → 1,3 on bottom, 2,4 on top → Final order: 4,2,1,3</div>
-            </div>
-            
-            <div class="algorithm-info" id="riffleInfo">
-                <h4>🃏 Riffle Shuffle</h4>
-                <p>Split the deck in half, then interleave cards from both halves. This mimics the common card shuffling technique where you riffle the two halves together.</p>
-                <div class="example">Example: Split [1,2,3,4,5,6] → [1,2,3] and [4,5,6] → Interleave → [4,1,5,2,6,3]</div>
-            </div>
-            
-            <div class="algorithm-info" id="monkeyInfo">
-                <h4>🐵 Monkey Shuffle</h4>
-                <p>Randomly pick a card from anywhere in the deck and move it to the top. Named for the chaotic, seemingly random nature of the shuffle.</p>
-                <div class="example">Example: [1,2,3,4,5,6] → randomly pick card 4 → [4,1,2,3,5,6]</div>
-            </div>
-            
-            <div class="algorithm-info" id="weaveInfo">
-                <h4>🧵 Weave Shuffle</h4>
-                <p>Take every nth card from the deck (based on skip distance) and move them to the end, preserving their relative order.</p>
-                <div class="example">Example: [1,2,3,4,5,6] with skip=3 → take every 3rd: [3,6] → result: [1,2,4,5,3,6]</div>
-            </div>
-            
-            <div class="algorithm-info" id="faroInfo">
-                <h4>✨ Perfect Faro Shuffle</h4>
-                <p>Mathematically perfect riffle shuffle. Split exactly in half and interleave with perfect precision. Out-shuffle keeps top card on top, in-shuffle moves it to second position.</p>
-                <div class="example">Example: [1,2,3,4,5,6] → split [1,2,3][4,5,6] → out-shuffle: [1,4,2,5,3,6]</div>
-            </div>
-            
-            <div class="algorithm-info" id="pileInfo">
-                <h4>🏰 Pile Shuffle</h4>
-                <p>Deal cards one by one into multiple piles, then collect the piles in order. Creates interesting periodic patterns based on pile count.</p>
-                <div class="example">Example: [1,2,3,4,5,6] into 3 piles → [1,4][2,5][3,6] → collect: [1,4,2,5,3,6]</div>
-            </div>
-            
-            <div class="algorithm-info" id="spiralInfo">
-                <h4>🌀 Spiral Shuffle</h4>
-                <p>Place cards at positions determined by mathematical sequences like Fibonacci or prime numbers. Creates complex, mathematically interesting patterns.</p>
-                <div class="example">Example: Using Fibonacci positions (1,1,2,3,5...) to determine where each card goes in the new arrangement.</div>
-            </div>
-            
-            <div class="algorithm-info" id="reverseSectionsInfo">
-                <h4>🔁 Reverse Sections</h4>
-                <p>Split the deck into equal sections and reverse the order of cards within each section, keeping sections in the same position.</p>
-                <div class="example">Example: [1,2,3,4,5,6] into 3 sections → [2,1][4,3][6,5] → result: [2,1,4,3,6,5]</div>
-            </div>
-            
-            <div class="algorithm-info" id="cutInfo">
-                <h4>✂️ Cut Shuffle</h4>
-                <p>Cut the deck at a specific position and put the bottom portion on top. This is the simplest shuffle - just moving one section above another.</p>
-                <div class="example">Example: [1,2,3,4,5,6] cut at 50% → [1,2,3] and [4,5,6] → Put bottom on top → [4,5,6,1,2,3]</div>
-            </div>
-            
-            <div class="algorithm-info" id="fishermanInfo">
-                <h4>🎣 Fisherman Shuffle</h4>
-                <p>Alternately take cards from the very top and very bottom of the deck, building a new pile. Named for resembling how a fisherman might sort through a catch.</p>
-                <div class="example">Example: [1,2,3,4,5,6] → Take top(1), bottom(6), top(2), bottom(5) → New order: [1,6,2,5,3,4]</div>
-            </div>
-        </div>
-        
-        <!-- Simulation Settings -->
-        <div class="control-section">
-            <h3 class="section-title">⚙️ Simulation Settings</h3>
-            <div class="controls">
-                <div class="control-group">
-                    <label for="maxSteps">Maximum Steps:</label>
-                    <input type="number" id="maxSteps" value="100" min="10" max="1000" step="1">
-                    <div class="param-description">Stop simulation after this many steps if deck hasn't returned to original order</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Start Button -->
-        <div class="start-button-container">
-            <button id="startShuffle">🚀 Start Shuffle Analysis</button>
-        </div>
-        <div id="status" class="status" style="display: none;"></div>
-        
-        <!-- Unified Playback Controls -->
-        <div class="unified-controls" id="unifiedControls" style="display: none;">
-            <div class="control-buttons">
-                <button id="playPauseButton" class="playback-button play-button">▶ Play</button>
-                <button id="restartButton" class="playback-button restart-button">⏮ Restart</button>
-                <button id="prevStep" class="playback-button">⏮ Previous</button>
-                <button id="nextStep" class="playback-button">Next ⏭</button>
-                
-                <div class="speed-control">
-                    <label for="speedInput">Speed:</label>
-                    <input type="number" id="speedInput" class="speed-input" min="1" step="1" value="1">
-                    <span id="speedDisplay" class="speed-display">1x</span>
-                </div>
-                
-                <span class="step-info">Step: <span id="currentStep">0</span> / <span id="totalSteps">0</span></span>
-            </div>
-        </div>
-        
-        <div class="charts-wrapper">
-            <div class="chart-container">
-                <div class="visualization-header">
-                    <div class="control-group">
-                        <label for="visualizationType">Visualization Type:</label>
-                        <select id="visualizationType">
-                            <option value="waveform">Waveform (Default)</option>
-                            <option value="scatter">Card Scatter Plot</option>
-                            <option value="mandala">Mandala</option>
-                            <option value="particles">Particle System</option>
-                            <option value="dft">DFT Analysis</option>
-                        </select>
+        <div class="main-layout">
+            <!-- Left Sidebar Controls -->
+            <div class="controls-sidebar">
+                <!-- Deck Configuration -->
+                <div class="control-section">
+                    <h3 class="section-title">🃏 Configuration</h3>
+                    <div class="controls">
+                        <div class="control-group">
+                            <label for="cardsPerSuit">Cards per Suit:</label>
+                            <input type="number" id="cardsPerSuit" value="13" min="1" max="52" step="1">
+                        </div>
+                        
+                        <div class="control-group">
+                            <label for="numSuits">Number of Suits:</label>
+                            <input type="number" id="numSuits" value="4" min="1" max="8" step="1">
+                        </div>
+                        
+                        <div class="control-group">
+                            <label for="maxSteps">Max Steps:</label>
+                            <input type="number" id="maxSteps" value="100" min="10" max="1000" step="1">
+                        </div>
                     </div>
                 </div>
-                <div class="visualization-content">
-                    <canvas id="deckChart"></canvas>
-                    <svg id="scatterChart" style="display: none; width: 100%; height: 100%;"></svg>
-                    <svg id="waveformChart" style="display: none; width: 100%; height: 100%;"></svg>
-                    <svg id="mandalaChart" style="display: none; width: 100%; height: 100%;"></svg>
-                    <canvas id="particlesChart" style="display: none; width: 100%; height: 100%;"></canvas>
-                    <svg id="dftChart" style="display: none; width: 100%; height: 100%;"></svg>
+                
+                <!-- Shuffle Algorithm -->
+                <div class="control-section">
+                    <h3 class="section-title">🔀 Algorithm</h3>
+                    <div class="controls">
+                        <div class="control-group">
+                            <div class="algorithm-row">
+                                <label for="shuffleAlgorithm">Type:</label>
+                                <span class="help-icon" onclick="showAlgorithmHelp()" title="Click to learn about this algorithm">?</span>
+                            </div>
+                            <select id="shuffleAlgorithm">
+                                <option value="alternating">Alternating Top/Bottom</option>
+                                <option value="alternating-reverse">Alternating Bottom/Top</option>
+                                <option value="riffle">Riffle Shuffle</option>
+                                <option value="cut">Cut Shuffle</option>
+                                <option value="fisherman">Fisherman Shuffle</option>
+                                <option value="monkey">Monkey Shuffle</option>
+                                <option value="weave">Weave Shuffle</option>
+                                <option value="faro">Perfect Faro Shuffle</option>
+                                <option value="pile">Pile Shuffle</option>
+                                <option value="spiral">Spiral Shuffle</option>
+                                <option value="reverse-sections">Reverse Sections</option>
+                            </select>
+                        </div>
+                        
+                        <div class="control-group" id="alternatingParams" style="display: none;">
+                            <label for="cardsPerMove">Cards per Move:</label>
+                            <input type="number" id="cardsPerMove" value="1" min="1" max="10" step="1">
+                        </div>
+                        
+                        <div class="control-group" id="riffleParams" style="display: none;">
+                            <label for="riffleInterleavePerfect">Perfect Interleave:</label>
+                            <input type="checkbox" id="riffleInterleavePerfect" checked>
+                        </div>
+                        
+                        <div class="control-group" id="weaveParams" style="display: none;">
+                            <label for="weaveSkipDistance">Skip Distance:</label>
+                            <input type="number" id="weaveSkipDistance" value="3" min="2" max="8" step="1">
+                        </div>
+                        
+                        <div class="control-group" id="faroParams" style="display: none;">
+                            <label for="faroType">Faro Type:</label>
+                            <select id="faroType">
+                                <option value="out">Out-shuffle</option>
+                                <option value="in">In-shuffle</option>
+                            </select>
+                        </div>
+                        
+                        <div class="control-group" id="pileParams" style="display: none;">
+                            <label for="pileCount">Number of Piles:</label>
+                            <input type="number" id="pileCount" value="3" min="2" max="7" step="1">
+                        </div>
+                        
+                        <div class="control-group" id="spiralParams" style="display: none;">
+                            <label for="spiralSequence">Sequence Type:</label>
+                            <select id="spiralSequence">
+                                <option value="fibonacci">Fibonacci</option>
+                                <option value="powers2">Powers of 2</option>
+                                <option value="primes">Prime Numbers</option>
+                            </select>
+                        </div>
+                        
+                        <div class="control-group" id="reverseSectionsParams" style="display: none;">
+                            <label for="sectionCount">Number of Sections:</label>
+                            <input type="number" id="sectionCount" value="4" min="2" max="8" step="1">
+                        </div>
+                        
+                        <div class="control-group" id="cutParams" style="display: none;">
+                            <label for="cutPosition">Cut Position (%):</label>
+                            <input type="number" id="cutPosition" value="50" min="10" max="90" step="1">
+                        </div>
+                    </div>
                 </div>
+                
+                <!-- Start Button -->
+                <button id="startShuffle" class="sidebar-start-button">🚀 Start Analysis</button>
             </div>
             
-            <div class="chord-container">
-                <div class="chord-title">🔄 Position Movement Diagram</div>
-                <svg id="chordDiagram"></svg>
+            <!-- Main Visualization Area -->
+            <div class="visualization-area">
+                <!-- Status -->
+                <div id="status" class="status" style="display: none;"></div>
+                
+                <!-- Playback Controls -->
+                <div class="unified-controls" id="unifiedControls" style="display: none;">
+                    <div class="control-buttons">
+                        <button id="playPauseButton" class="playback-button play-button">▶ Play</button>
+                        <button id="restartButton" class="playback-button restart-button">⏮ Restart</button>
+                        <button id="prevStep" class="playback-button">⏮ Previous</button>
+                        <button id="nextStep" class="playback-button">Next ⏭</button>
+                        
+                        <div class="speed-control">
+                            <label for="speedInput">Speed:</label>
+                            <input type="number" id="speedInput" class="speed-input" min="1" step="1" value="1">
+                            <span id="speedDisplay" class="speed-display">1x</span>
+                        </div>
+                        
+                        <span class="step-info">Step: <span id="currentStep">0</span> / <span id="totalSteps">0</span></span>
+                    </div>
+                </div>
+                
+                <!-- Visualizations -->
+                <div class="viz-charts-container">
+                    <div class="chart-container">
+                        <div class="visualization-header">
+                            <div class="control-group">
+                                <label for="visualizationType">Visualization:</label>
+                                <select id="visualizationType">
+                                    <option value="waveform">Waveform</option>
+                                    <option value="scatter">Scatter Plot</option>
+                                    <option value="mandala">Mandala</option>
+                                    <option value="particles">Particles</option>
+                                    <option value="dft">DFT Analysis</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="visualization-content">
+                            <canvas id="deckChart"></canvas>
+                            <svg id="scatterChart" style="display: none; width: 100%; height: 100%;"></svg>
+                            <svg id="waveformChart" style="display: none; width: 100%; height: 100%;"></svg>
+                            <svg id="mandalaChart" style="display: none; width: 100%; height: 100%;"></svg>
+                            <canvas id="particlesChart" style="display: none; width: 100%; height: 100%;"></canvas>
+                            <svg id="dftChart" style="display: none; width: 100%; height: 100%;"></svg>
+                        </div>
+                    </div>
+                    
+                    <div class="chord-container">
+                        <div class="chord-title">🔄 Position Movement</div>
+                        <svg id="chordDiagram"></svg>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
+
+    <!-- Algorithm Help Lightbox -->
+    <div class="lightbox-overlay" id="algorithmLightbox">
+        <div class="lightbox-content">
+            <button class="lightbox-close" onclick="hideLightbox()">&times;</button>
+            <div class="lightbox-title" id="lightboxTitle">Algorithm Name</div>
+            <div class="lightbox-description" id="lightboxDescription">Description goes here</div>
+            <div class="lightbox-example" id="lightboxExample">Example goes here</div>
         </div>
     </div>
 
