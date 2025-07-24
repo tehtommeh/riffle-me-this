@@ -556,6 +556,7 @@ class DeckShuffleVisualizer {
         document.getElementById('waveformChart').style.display = 'none';
         document.getElementById('mandalaChart').style.display = 'none';
         document.getElementById('particlesChart').style.display = 'none';
+        document.getElementById('dftChart').style.display = 'none';
         
         switch (visualizationType) {
             case 'bar':
@@ -572,6 +573,9 @@ class DeckShuffleVisualizer {
                 break;
             case 'particles':
                 this.showParticleSystem();
+                break;
+            case 'dft':
+                this.showDFT();
                 break;
             default:
                 this.showBarChart();
@@ -1171,6 +1175,297 @@ class DeckShuffleVisualizer {
         return `${x},${y} ${x1},${y1} ${x2},${y2}`;
     }
     
+    // DFT calculation function
+    calculateDFT(signal) {
+        const N = signal.length;
+        const dft = [];
+        
+        for (let k = 0; k < N; k++) {
+            let real = 0;
+            let imag = 0;
+            
+            for (let n = 0; n < N; n++) {
+                const angle = -2 * Math.PI * k * n / N;
+                real += signal[n] * Math.cos(angle);
+                imag += signal[n] * Math.sin(angle);
+            }
+            
+            const magnitude = Math.sqrt(real * real + imag * imag);
+            const phase = Math.atan2(imag, real);
+            
+            dft.push({
+                magnitude: magnitude,
+                phase: phase,
+                real: real,
+                imag: imag,
+                frequency: k
+            });
+        }
+        
+        return dft;
+    }
+    
+    showDFT() {
+        document.getElementById('dftChart').style.display = 'block';
+        
+        const svg = d3.select('#dftChart');
+        svg.selectAll('*').remove();
+        
+        const currentDeck = this.shuffleSteps[this.currentStepIndex];
+        const container = svg.node().parentElement;
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        
+        svg.attr('width', width).attr('height', height);
+        
+        // Get unique suits in the deck
+        const suits = [...new Set(currentDeck.map(card => card.suit))].sort();
+        
+        const margin = { top: 40, right: 20, bottom: 50, left: 70 };
+        const plotWidth = width - margin.left - margin.right;
+        const plotHeight = height - margin.top - margin.bottom;
+        
+        // Calculate DFT for all cards (using original positions as signal)
+        const allCardSignal = currentDeck.map(card => card.originalPosition);
+        const allCardDFT = this.calculateDFT(allCardSignal);
+        
+        // Calculate DFT for each suit
+        const suitDFTs = suits.map(suit => {
+            const suitCards = currentDeck.filter(card => card.suit === suit);
+            const suitSignal = suitCards.map(card => card.originalPosition);
+            return {
+                suit: suit,
+                dft: this.calculateDFT(suitSignal),
+                color: this.suitColors[suit],
+                name: `Suit ${suit + 1}`
+            };
+        });
+        
+        // Combine all DFT data
+        const allDFTData = [
+            {
+                name: 'All Cards',
+                dft: allCardDFT,
+                color: '#FFFFFF',
+                strokeWidth: 4
+            },
+            ...suitDFTs.map(suitData => ({
+                name: suitData.name,
+                dft: suitData.dft,
+                color: suitData.color,
+                strokeWidth: 3
+            }))
+        ];
+        
+        // Add title
+        svg.append('text')
+            .attr('x', width / 2)
+            .attr('y', 30)
+            .attr('text-anchor', 'middle')
+            .style('fill', 'white')
+            .style('font-size', '18px')
+            .style('font-weight', 'bold')
+            .text(`Combined DFT Analysis - Step ${this.currentStepIndex}`);
+        
+        // Create frequency scale (only show meaningful frequencies - up to N/2)
+        const maxFreq = Math.floor(allCardSignal.length / 2);
+        const xScale = d3.scaleLinear()
+            .domain([0, maxFreq])
+            .range([0, plotWidth]);
+        
+        // Find global maximum magnitude for consistent scaling
+        const globalMaxMagnitude = d3.max(allDFTData, series => 
+            d3.max(series.dft.slice(0, maxFreq + 1), d => d.magnitude)
+        );
+        
+        const yScale = d3.scaleLinear()
+            .domain([0, globalMaxMagnitude])
+            .range([plotHeight, 0]);
+        
+        // Draw the combined plot
+        this.drawCombinedDFTPlot(svg, allDFTData, maxFreq, xScale, yScale, margin, plotWidth, plotHeight);
+    }
+    
+    drawCombinedDFTPlot(svg, allDFTData, maxFreq, xScale, yScale, margin, plotWidth, plotHeight) {
+        const g = svg.append('g')
+            .attr('transform', `translate(${margin.left}, ${margin.top})`);
+        
+        // Add background
+        g.append('rect')
+            .attr('width', plotWidth)
+            .attr('height', plotHeight)
+            .attr('fill', 'rgba(0,0,0,0.4)')
+            .attr('stroke', 'rgba(255,255,255,0.2)')
+            .attr('rx', 5);
+        
+        // Add grid lines with better visibility
+        const xTicks = xScale.ticks(Math.min(15, maxFreq));
+        const yTicks = yScale.ticks(10);
+        
+        // Vertical grid lines
+        g.selectAll('.grid-line-x')
+            .data(xTicks)
+            .enter()
+            .append('line')
+            .attr('class', 'grid-line-x')
+            .attr('x1', d => xScale(d))
+            .attr('x2', d => xScale(d))
+            .attr('y1', 0)
+            .attr('y2', plotHeight)
+            .style('stroke', 'rgba(255,255,255,0.15)')
+            .style('stroke-width', 1);
+        
+        // Horizontal grid lines
+        g.selectAll('.grid-line-y')
+            .data(yTicks)
+            .enter()
+            .append('line')
+            .attr('class', 'grid-line-y')
+            .attr('x1', 0)
+            .attr('x2', plotWidth)
+            .attr('y1', d => yScale(d))
+            .attr('y2', d => yScale(d))
+            .style('stroke', 'rgba(255,255,255,0.15)')
+            .style('stroke-width', 1);
+        
+        // Add axes
+        const xAxis = d3.axisBottom(xScale)
+            .ticks(Math.min(15, maxFreq))
+            .tickFormat(d => Math.round(d));
+        
+        const yAxis = d3.axisLeft(yScale)
+            .ticks(10)
+            .tickFormat(d => d.toFixed(1));
+        
+        g.append('g')
+            .attr('transform', `translate(0, ${plotHeight})`)
+            .call(xAxis)
+            .selectAll('text')
+            .style('fill', 'white')
+            .style('font-size', '13px')
+            .style('font-weight', 'bold');
+        
+        g.append('g')
+            .call(yAxis)
+            .selectAll('text')
+            .style('fill', 'white')
+            .style('font-size', '13px')
+            .style('font-weight', 'bold');
+        
+        // Style axes
+        g.selectAll('.domain, .tick line')
+            .style('stroke', 'rgba(255,255,255,0.8)')
+            .style('stroke-width', 2);
+        
+        // Add axis labels
+        g.append('text')
+            .attr('x', plotWidth / 2)
+            .attr('y', plotHeight + 40)
+            .attr('text-anchor', 'middle')
+            .style('fill', 'white')
+            .style('font-size', '16px')
+            .style('font-weight', 'bold')
+            .text('Frequency');
+        
+        g.append('text')
+            .attr('transform', 'rotate(-90)')
+            .attr('x', -plotHeight / 2)
+            .attr('y', -45)
+            .attr('text-anchor', 'middle')
+            .style('fill', 'white')
+            .style('font-size', '16px')
+            .style('font-weight', 'bold')
+            .text('Magnitude');
+        
+        // Create line generator
+        const line = d3.line()
+            .x((d, i) => xScale(i))
+            .y(d => yScale(d.magnitude))
+            .curve(d3.curveMonotoneX);
+        
+        // Draw lines for each series
+        allDFTData.forEach((series, seriesIndex) => {
+            const dftData = series.dft.slice(0, maxFreq + 1);
+            
+            // Draw line
+            g.append('path')
+                .datum(dftData)
+                .attr('d', line)
+                .style('fill', 'none')
+                .style('stroke', series.color)
+                .style('stroke-width', series.strokeWidth)
+                .style('opacity', 0.9)
+                .style('stroke-dasharray', seriesIndex === 0 ? 'none' : '2,2'); // Dash suit lines
+            
+            // Add dots for data points
+            g.selectAll(`.dft-dot-${seriesIndex}`)
+                .data(dftData)
+                .enter()
+                .append('circle')
+                .attr('class', `dft-dot-${seriesIndex}`)
+                .attr('cx', (d, i) => xScale(i))
+                .attr('cy', d => yScale(d.magnitude))
+                .attr('r', seriesIndex === 0 ? 5 : 4)
+                .attr('fill', series.color)
+                .attr('stroke', 'white')
+                .attr('stroke-width', 1)
+                .style('opacity', 0.8)
+                .append('title')
+                .text(d => `${series.name}\nFrequency: ${d.frequency}\nMagnitude: ${d.magnitude.toFixed(2)}\nPhase: ${d.phase.toFixed(2)}`);
+        });
+        
+        // Add legend in top-left corner
+        const legend = g.append('g')
+            .attr('class', 'legend')
+            .attr('transform', `translate(15, 15)`);
+        
+        // Legend background
+        const legendHeight = allDFTData.length * 25 + 10;
+        const legendWidth = 120;
+        legend.append('rect')
+            .attr('x', -5)
+            .attr('y', -5)
+            .attr('width', legendWidth)
+            .attr('height', legendHeight)
+            .attr('fill', 'rgba(0,0,0,0.7)')
+            .attr('stroke', 'rgba(255,255,255,0.3)')
+            .attr('rx', 5);
+        
+        allDFTData.forEach((series, i) => {
+            const legendRow = legend.append('g')
+                .attr('transform', `translate(5, ${i * 25 + 10})`);
+            
+            // Legend line
+            legendRow.append('line')
+                .attr('x1', 0)
+                .attr('x2', 25)
+                .attr('y1', 0)
+                .attr('y2', 0)
+                .style('stroke', series.color)
+                .style('stroke-width', series.strokeWidth)
+                .style('stroke-dasharray', i === 0 ? 'none' : '3,3');
+            
+            // Legend dot
+            legendRow.append('circle')
+                .attr('cx', 12)
+                .attr('cy', 0)
+                .attr('r', i === 0 ? 5 : 4)
+                .attr('fill', series.color)
+                .attr('stroke', 'white')
+                .attr('stroke-width', 1);
+            
+            // Legend text
+            legendRow.append('text')
+                .attr('x', 30)
+                .attr('y', 0)
+                .attr('dy', '0.35em')
+                .style('fill', 'white')
+                .style('font-size', '13px')
+                .style('font-weight', i === 0 ? 'bold' : 'normal')
+                .text(series.name);
+        });
+    }
+
     darkenColor(color) {
         // Simple function to darken a hex color for borders
         const hex = color.replace('#', '');
