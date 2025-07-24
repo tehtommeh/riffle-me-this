@@ -394,7 +394,94 @@
             color: #6b7280;
             text-align: center;
             line-height: 1.7;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .podcast-reference {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            text-align: center;
+        }
+        
+        .podcast-reference h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 10px;
+            letter-spacing: 0.025em;
+        }
+        
+        .podcast-reference p {
+            font-size: 0.95rem;
+            color: #4b5563;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .podcast-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .podcast-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #1DB954 0%, #1ed760 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+        }
+        
+        .podcast-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(29, 185, 84, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+        
+        .podcast-link:before {
+            content: "🎧";
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+        
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #333 0%, #555 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            margin-top: 15px;
+        }
+        
+        .github-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            text-decoration: none;
+            color: white;
+            background: linear-gradient(135deg, #444 0%, #666 100%);
+        }
+        
+        .github-link:before {
+            content: "⚡";
+            margin-right: 8px;
+            font-size: 1rem;
         }
         
         .problem-explanation {
@@ -486,6 +573,18 @@
                 Discover the mathematical beauty hidden in card shuffling algorithms. 
                 Watch as simple shuffles create complex patterns and fascinating cycles.
             </p>
+            
+            <div class="podcast-reference">
+                <h3>Inspired by "A Problem Squared"</h3>
+                <p>This visualization was created after listening to Matt Parker and Bec Hill discuss card shuffling mathematics in Episode 114 of their brilliant podcast.</p>
+                <div class="podcast-links">
+                    <a href="https://open.spotify.com/show/7Hp5QDk9PsWyEXtcsDz34a?si=a0028c0c287c4830" target="_blank" class="podcast-link">Listen to Podcast</a>
+                    <a href="https://open.spotify.com/episode/5SgOEujDSh092cuTRtUVTD?si=3853d46f46ac4656" target="_blank" class="podcast-link">Episode 114</a>
+                </div>
+                <div style="text-align: center;">
+                    <a href="https://github.com/tehtommeh/riffle-me-this/" target="_blank" class="github-link">View Source Code</a>
+                </div>
+            </div>
         </div>
         
         <div class="main-content">
